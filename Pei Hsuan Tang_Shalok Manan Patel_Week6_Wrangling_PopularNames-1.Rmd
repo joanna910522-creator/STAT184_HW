@@ -1,19 +1,18 @@
 ---
 title: "Popular names"
-subtitle: "Week 6 Activity"
 author: "Pei Hsuan Tang and Shlok Manan Patel"
 date: "Sun Oct 4"
-output: 
+output:
   html_notebook:
     fig_height: 3
     fig_width: 5
+subtitle: Week 6 Activity
 ---
 
 # Set Up
 
 ```{r message=FALSE}
 # load necessary packages
-rm(list = ls())
 library(tidyverse)
 library(dcData)
 library(mosaic)
@@ -34,7 +33,7 @@ data("BabyNames")
 
 ### Step 1
 
-####Description
+### Description
 
 The US Social Security Administration provides yearly lists of names given to babies. These data combine the yearly lists.
 
@@ -45,6 +44,7 @@ name - sex - count - year
 
 ```{r}
 ## Helpful to look at the data a few different ways (see Ch 9 for more).
+
 
 ```
 
@@ -61,28 +61,27 @@ sex
 
 ##### What variable(s) in the graph are similar to corresponding variables in the raw data table, but might have been transformed in some way?
 
-popularity 
-
-
+Total is similar to the corresponding variable count, but it has transformed from count for each sex to total count M + F.
 
 ### Step 4
 
 ##### Have cases been filtered out?
 
+Yes, only three names were left on the graph.
 
 
 ##### Have cases been grouped and summarized within groups in any way?
 
+cases were grouped by names, and summarized by summing up the count from both sex M and F.
 
 
 ##### Have any new variables been introduced?  If so, what the relationship between the new variables and existing variables?
 
-
-
+New variables total were introduced. Total is similar to the corresponding variable count, but it has transformed from count for each sex to total count M + F.
 
 
 ### Step 5
-
+First, group all the cases by name and year, and summarize it by summing counts of name in each year, using the variable total.
 
 
 ### Step 6
@@ -95,6 +94,11 @@ popularity
 
 ```{r}
 
+GlyphReadyForm <-
+  BabyNames %>%
+  group_by(name, year) %>%
+  summarise(total = sum(count)) %>%
+  filter(name %in% c("Pei", "Shlok", "Joanna", "Mia"))
 
 ```
 
@@ -103,7 +107,7 @@ popularity
 
 Here's the sample code provided by the book:
 
-```
+```{r}
 GlyphReadyForm %>%
   ggplot(aes(x = year, y = total, group = name)) + 
   geom_line(size = 1, alpha = 0.5, aes(color = name)) + 
