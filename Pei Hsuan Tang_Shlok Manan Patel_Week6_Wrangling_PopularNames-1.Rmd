@@ -1,0 +1,139 @@
+---
+title: "Popular names"
+author: "Pei Hsuan Tang and Shlok Manan Patel"
+date: "Sun Oct 4"
+output:
+  html_notebook:
+    fig_height: 3
+    fig_width: 5
+subtitle: Week 6 Activity
+---
+
+# Set Up
+
+```{r message=FALSE}
+# load necessary packages
+library(tidyverse)
+library(dcData)
+library(mosaic)
+library(esquisse)
+```
+
+
+```{r}
+# Load the BabyNames data into RStudio environment (from dcData package)
+data("BabyNames")
+
+```
+
+# Activity
+
+**Goal**: By the end of the activity, each team will create a graph (like Figure A.1 on p 159) showing ups and downs in the popularity of the names at your table according to the U.S. social security registry.  
+
+
+### Step 1
+
+### Description
+
+The US Social Security Administration provides yearly lists of names given to babies. These data combine the yearly lists.
+
+'BabyNames' is the raw data from the SSA. The case is a year-name-sex, for example: Jane F 1922. The count is the number of children of that sex given that name in that year. Names assigned to fewer than five children of one sex in any year are not listed, presumably out of privacy concerns.
+
+Available variable:
+name - sex - count - year
+
+```{r}
+## Helpful to look at the data a few different ways (see Ch 9 for more).
+
+# Look at the first few rows
+
+head(BabyNames)
+
+# View the structure of the dataset
+
+str(BabyNames)
+
+# Get a summary of each variable
+
+summary(BabyNames)
+
+```
+
+### Step 2
+
+[This should be done by hand on paper, nothing to show in the HTML doc]
+
+
+### Step 3 
+
+##### What variable(s) from the raw data table do not appear at all in the graph?
+
+sex
+
+##### What variable(s) in the graph are similar to corresponding variables in the raw data table, but might have been transformed in some way?
+
+Popularity is related to the count variable in the raw data. The total variable is similar to the corresponding variable count, but it has transformed from count for each sex to total count M + F.
+
+### Step 4
+
+##### Have cases been filtered out?
+
+Yes, the data set has been filtered out with only the selected names remain, only three names were left on the graph.
+
+
+##### Have cases been grouped and summarized within groups in any way?
+
+Cases were grouped by name and year, and summarized by summing up the count from both sex M and F.
+
+
+##### Have any new variables been introduced?  If so, what the relationship between the new variables and existing variables?
+
+New variables total were introduced. It is calculated by summing the ⁠ count ⁠ values for each name within each year. Total is similar to the corresponding variable count, but it has transformed from count for each sex to total count M + F.
+
+
+### Step 5
+To prepare the BabyNames data for the graph, I first filter the dataset to include only the names selected by our group. Next, I group the data by year and name. I then use ⁠ summarise() ⁠ to create a new variable called ⁠ total ⁠ by adding the count values for each name within each year. This combines the counts for the same name and year and produces the popularity value used in the graph. In other words, first, group all the cases by name and year, and summarize it by summing counts of name in each year, using the variable total.
+
+
+### Step 6
+
+[This should be done by hand on paper, nothing to show in the HTML doc]
+
+
+
+### Step 7
+
+```{r}
+
+# Filter, group, and summarize the data
+
+GlyphReadyForm <-
+  BabyNames %>%
+  group_by(name, year) %>%
+  summarise(total = sum(count), .groups = "drop") %>%
+  
+# Replace these names with the first names selected by your group
+
+  filter(name %in% c("Pei", "Shlok", "Joanna", "Mia"))
+
+# Look at the resulting data
+head(GlyphReadyForm)
+
+
+```
+
+
+### Graph It!
+
+Here's the sample code provided by the book:
+
+```{r}
+GlyphReadyForm %>%
+  ggplot(aes(x = year, y = total, group = name)) + 
+  geom_line(size = 1, alpha = 0.5, aes(color = name)) + 
+  ylab("Popularity") + xlab("Year")
+```
+
+
+
+Note: if someone in your group has a name that hasn't been registered with the US Social Security Administration for a baby born in the United States, it's okay that the student's name may not appear on the plot.
