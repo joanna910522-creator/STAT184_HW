@@ -1,0 +1,141 @@
+---
+title: "Unit6_test"
+author: "Joanna"
+date: "2026-09-29"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+rm(list = ls())
+library(dcData)
+library(tidyverse)
+library(ggplot2)
+library(esquisse)
+data("Minneapolis2013")
+data("diamonds")
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+##SameFirstSecond <-
+  Minneapolis2013 %>%
+  filter(First == Second) %>%
+  group_by(First, Second) %>%
+  summarise(total = n(), .groups = "drop") %>%
+  arrange(desc(total)) %>%
+  head(3)
+
+##OleSaviorTopSecond <-
+  Minneapolis2013 %>%
+  filter(First == "OLE SAVIOR") %>%
+  group_by(Second) %>%
+  summarise(count = n(), .groups = "drop") %>%
+  arrange(desc(count)) %>%
+  head(3)
+
+MostPopNameSex <-
+  BabyNames %>%
+  group_by(name, sex) %>%
+  summarise(total = sum(count), .groups = "drop") %>%
+  group_by(sex) %>%
+  mutate(name_rank = rank(desc(total)))%>%
+  filter(name_rank <=5) %>%
+  arrange(sex, name_rank)
+
+NameChange <-
+  BabyNames %>%
+  group_by(year, name) %>%
+  summarise(n = sum(count), .groups = "drop_last") %>%
+  mutate(rank = rank(desc(n))) %>%
+  mutate(ranking = ifelse(rank <= 100,'Top_100', 'Below')) %>%
+  group_by(year, ranking) %>%
+  summarise(total = sum(n), .groups = "drop_last") %>%
+  arrange(desc(year))
+
+BabyNames_ranked <- BabyNames %>%
+   group_by(year, name) %>%
+   summarise(updated_count = sum(count)) %>%
+   mutate(ranking = if_else(condition = (rank(desc(updated_count))<=100), true = "Top_100", false = "Below"))%>%
+   group_by(year, ranking) %>%
+   summarise(total = sum(updated_count)) %>%
+   arrange(desc(year))
+
+FractionofTop100 <-
+  NameChange %>%
+  pivot_wider(names_from = ranking, values_from = total) %>%
+  mutate(fraction = Top_100 / (Below + Top_100))
+
+FractionofTop100 <-
+  NameChange %>%
+  spread(ranking, total) %>%
+  mutate(fraction = Top_100 / (Below + Top_100))
+  
+PopularandNot <-
+  BabyNames %>%
+  group_by(year, name) %>%
+  summarise(total = sum(count), .groups = "drop") %>%
+  group_by(year) %>%
+  mutate(rank = rank(desc(total))) %>%
+  filter(rank <= 50 | rank >= 1000) %>%
+  mutate(
+    ispop = rank <= 50,
+    notpop = rank >= 1000
+    ) %>%
+  group_by(name) %>%
+  summarise(
+    everpop = any(ispop),
+    everunpop = any(notpop)
+    ) %>%
+  filter(everpop & everunpop)
+
+TableA <-
+  BabyNames %>%
+  arrange(count)
+
+TableB <-
+  BabyNames %>%
+  filter(sex == "F")
+
+TableC <-
+  BabyNames %>%
+  filter(sex == "M")
+
+TableD <-
+  BabyNames %>%
+  summarise (total = sum(count))
+
+TableE <-
+  BabyNames %>%
+  select(name, count)
+
+diamonds %>%
+  group_by(clarity) %>%
+  summarise(avg_table_per_carat = mean(table/carat), .groups = "drop") %>%
+  arrange(desc(avg_table_per_carat)) %>%
+  head(1)
+
+Minneapolis2013 %>%
+  group_by(First) %>%
+  summarise(total = n()) %>%
+  ##arrange(total) %>%
+  mutate(First = ifelse(total < 5000, "minor", First))
+
+
+
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
