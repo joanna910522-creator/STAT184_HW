@@ -1,0 +1,68 @@
+---
+title: "Unit7_test"
+author: "Joanna"
+date: "2026-10-08"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(dcData)
+library(dplyr)
+library(ggplot2)
+data("ZipGeography", "ZipDemography")
+library(esquisse)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+head(ZipDemography)
+head(ZipGeography)
+
+AgeCountPopPerZip <-
+  ZipDemography %>%
+  select(Under5years, X18yearsandover, X65yearsandover, Totalpopulation,ZIP) %>%
+  left_join(
+    ZipGeography %>%
+      select(State, ZIP), 
+      by = c("ZIP" = "ZIP")) %>%
+  
+  group_by(State) %>%
+  summarise(
+    X5yearsto18 = sum(Totalpopulation - Under5years - X18yearsandover, na.rm = TRUE),
+    Under5years = sum(Under5years, na.rm = TRUE),
+    X18yearsto65 = sum(X18yearsandover - X65yearsandover, na.rm = TRUE),
+    X65yearsandover = sum(X65yearsandover, na.rm = TRUE)
+    ) %>%
+  
+  pivot_longer(
+    cols = c(Under5years, X5yearsto18, X18yearsto65, X65yearsandover),
+    names_to = "AgeGroup",
+    values_to = "Count"
+  )
+
+ggplot(AgeCountPopPerZip) +
+ aes(x = AgeGroup, y = Count, fill = AgeGroup) +
+ geom_col() +
+ scale_fill_hue(direction = 1) +
+ theme_minimal() +
+ facet_wrap(vars(State))
+
+
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
